@@ -2,12 +2,27 @@ import streamlit as st
 from transformers import pipeline
 from PIL import Image
 from rembg import remove
+from io import BytesIO
 
 def improving_picture(file_name):
     image = file_name.getvalue()
-    new_image = remove(image)
+    new_image = remove(image, alpha_matting=True)
     return new_image
-
+def add_white_background_to_image_bytes(modified_image_bytes):
+    # Convert bytes to PIL Image
+    modified_image = Image.open(BytesIO(modified_image_bytes))
+    
+    # Create a new image with a white background of the same size as the modified image
+    new_image = Image.new("RGB", modified_image.size, "white")
+    
+    # Paste the modified image onto the white background
+    new_image.paste(modified_image, (0, 0), modified_image)
+    
+    # Convert the new image to bytes
+    output_image_bytes = BytesIO()
+    new_image.save(output_image_bytes, format='PNG')  # Change format if needed
+    
+    return output_image_bytes.getvalue()
 pipeline = pipeline(task="image-classification", model="julien-c/hotdog-not-hotdog")
 
 # Set the title and text color to dark green
@@ -32,8 +47,8 @@ if file_name is not None or image is not None:
         image = Image.open('data:image/jpeg;base64,' + img_encoded)
     else:
         # Open the uploaded image
-        image = image = Image.open(file_name)
-        image_rem = improving_picture(file_name)
+        image = Image.open(file_name)
+        image_rem = add_white_background_to_image_bytes(improving_picture(file_name))
 
     # Pass the captured image to the pipeline function
     predictions = pipeline(image)
