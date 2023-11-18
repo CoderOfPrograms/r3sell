@@ -1,8 +1,12 @@
 import streamlit as st
 from transformers import pipeline
 from PIL import Image
-import base64
-from improving_picture import improving_picture
+from rembg import remove
+
+def improving_picture(file_name):
+    image = file_name.getvalue()
+    new_image = remove(image)
+    return new_image
 
 pipeline = pipeline(task="image-classification", model="julien-c/hotdog-not-hotdog")
 
