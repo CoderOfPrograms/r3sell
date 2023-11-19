@@ -42,6 +42,5 @@ def get_quality(image_path):
 
     ans = element.text
 
-    driver.quit()
 
     return ans
