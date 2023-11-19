@@ -7,6 +7,8 @@ from ebay import search_ebay_sold_items
 from llava import get_quality
 from os.path import abspath
 import os
+from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
+
 
 def improving_picture(file_name):
     image = file_name.getvalue()
@@ -77,3 +79,17 @@ if file_name is not None or image is not None:
     col2.header("Probabilities")
     for p in predictions:
         col2.subheader(f"{ p['label'] }: { round(p['score'] * 100, 1)}%")
+anthropic = Anthropic(
+    api_key="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",
+)
+name = "Macbook Pro M1"
+description = "get_quality(abspath(nameFile))[5:]"
+price = str(search_ebay_sold_items(st.text_input("Image Title", value="Specificity is nice!")))
+s = "Name of Product is "+ name +". Min, 1st quartile, median, 3rd quartile, and max of used prices are "+ price +". Assume max is best used quality and min in worst used quality. Color and defects(consider in price and description) -  "+description+"(sub color with official colorname). Generate a price given previous which ends in .99. Feel free to search the web. Video should be a product/review video make sure video is real. Generate a product description and the relevant information for an ebay listing. Search the web for additional help and it should be good for the ebay algorithms. Give it as a JSON with these categories Product Name, Price, Condition, Brand, Type, Color, Description, Specifications, Size, Video, Department. Generate Facebook and Instagram ads with hashtags and other stuff to boost algorithm. "
+promp = "\n\nHuman ${userQuestion}\n\nAssistant:"
+completion = anthropic.completions.create(
+    model="claude-2",
+    max_tokens_to_sample=1000,
+    prompt=f"{HUMAN_PROMPT} "+s+f" {AI_PROMPT}",
+)
+st.write(completion.completion)

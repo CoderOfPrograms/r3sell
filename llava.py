@@ -9,6 +9,9 @@ driver = webdriver.Chrome()
 
 # Navigate to the website
 driver.get("https://llava-vl.github.io/")
+element = driver.find_element(By.CSS_SELECTOR,'gradio-app')
+
+driver.execute_script("arguments[0].scrollIntoView();", element)
 
 # Wait for the page to load (adjust the time as needed)
 time.sleep(2)
